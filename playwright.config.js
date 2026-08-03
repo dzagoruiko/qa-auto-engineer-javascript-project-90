@@ -8,10 +8,12 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   webServer: {
-    command: 'npm run dev',
+    command: 'npm run dev -- --host',
     port: 5173,
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000,
+    stdout: 'pipe',
+    stderr: 'pipe',
   },
   use: {
     baseURL: 'http://localhost:5173',

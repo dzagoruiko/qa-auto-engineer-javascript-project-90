@@ -5,7 +5,7 @@ dev:
 	npm run dev
 
 test:
-	npx playwright test --reporter=list
+	npx playwright test
 
 test-ui:
 	npx playwright test --ui

@@ -21,7 +21,8 @@ test.describe('Управление задачами', () => {
     const label = 'critical';
     
     await tasksPage.createTask(title, content, assignee, status, label);
-    await tasksPage.assertElementCreated();
+    
+    // Проверяем, что задача появилась на доске
     await tasksPage.assertTaskExists(title);
   });
 

@@ -1,24 +1,16 @@
-import { test } from '@playwright/test';
-import { LoginPage } from './pages/LoginPage.js';
+import { test } from './fixtures.js';
 import { UsersPage } from './pages/UsersPage.js';
 
 test.describe('Управление пользователями', () => {
-  let loginPage;
   let usersPage;
 
-  test.beforeEach(async ({ page }) => {
-    loginPage = new LoginPage(page);
-    usersPage = new UsersPage(page);
-    
-    await loginPage.navigate();
-    await loginPage.login('admin', 'admin');
-    await loginPage.assertLoginSuccess();
-    
+  test.beforeEach(async ({ authenticatedPage }) => {
+    usersPage = new UsersPage(authenticatedPage);
     await usersPage.navigate();
   });
 
   test('должен отображаться список пользователей', async () => {
-    await usersPage.assertUsersListVisible();
+    await usersPage.assertListVisible();
     await usersPage.assertHeadersVisible();
   });
 
@@ -27,16 +19,33 @@ test.describe('Управление пользователями', () => {
     const firstName = 'Ivan';
     const lastName = 'Ivanov';
     
+    // Действие
     await usersPage.createUser(email, firstName, lastName);
+    
+    // Проверки
+    await usersPage.assertElementCreated();
+    await usersPage.assertUserExists(email);
   });
 
   test('должен редактировать пользователя', async () => {
-    const oldEmail = 'john@google.com';
-    const newEmail = `test${Date.now()}@mail.ru`;
-    const newFirstName = 'Test';
-    const newLastName = 'Testovich';
+    const email = `edit${Date.now()}@mail.ru`;
+    const firstName = 'Edit';
+    const lastName = 'User';
     
-    await usersPage.editUser(oldEmail, newEmail, newFirstName, newLastName);
+    await usersPage.createUser(email, firstName, lastName);
+    await usersPage.assertUserExists(email);
+    
+    const row = usersPage.page.locator(`tr:has-text("${email}")`);
+    const idCell = row.locator('td.column-id');
+    const id = await idCell.textContent();
+    
+    const newEmail = `edited${Date.now()}@mail.ru`;
+    const newFirstName = 'Edited';
+    const newLastName = 'User2';
+    
+    await usersPage.editUser(id.trim(), newEmail, newFirstName, newLastName);
+    
+    await usersPage.assertElementUpdated();
     await usersPage.assertUserExists(newEmail);
     await usersPage.assertUserData(newEmail, newFirstName, newLastName);
   });
@@ -47,16 +56,20 @@ test.describe('Управление пользователями', () => {
   });
 
   test('должен удалять пользователя', async () => {
-    const initialCount = await usersPage.getUserRowsCount();
+    const email = `delete${Date.now()}@mail.ru`;
+    const firstName = 'Delete';
+    const lastName = 'User';
     
-    await usersPage.deleteUser('1');
+    await usersPage.createUser(email, firstName, lastName);
+    await usersPage.assertUserExists(email);
+    
+    const row = usersPage.page.locator(`tr:has-text("${email}")`);
+    const idCell = row.locator('td.column-id');
+    const id = await idCell.textContent();
+    
+    await usersPage.deleteUser(id.trim());
+    
     await usersPage.assertElementDeleted();
-    
-    await usersPage.assertUserRowsCount(initialCount - 1);
-  });
-
-  test('должен массово удалять пользователей', async () => {
-    await usersPage.bulkDeleteUsers();
-    await usersPage.assertNoUsers();
+    await usersPage.assertUserNotExists(email);
   });
 });

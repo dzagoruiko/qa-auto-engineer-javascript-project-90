@@ -7,15 +7,15 @@ export class LoginPage {
     this.usernameInput = page.getByRole('textbox', { name: 'Username' });
     this.passwordInput = page.getByRole('textbox', { name: 'Password' });
     this.loginButton = page.getByRole('button', { name: 'Sign in' });
-    // Селектор для аватара пользователя
-    this.userMenu = page.locator('.css-6u3hli-RaUserMenu-root');
-    // Кнопка Logout (индекс 1)
-    this.logoutMenuItem = page.locator('.MuiList-root').nth(1);
+    // Используем роли вместо CSS-хешей
+    this.userMenu = page.getByRole('button', { name: 'Profile' });
+    this.logoutMenuItem = page.getByRole('menuitem', { name: 'Logout' });
+    this.errorMessage = page.locator('.RaLogin-error');
   }
 
   async navigate() {
-    await this.page.goto('http://localhost:5173/#/login');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.goto('/#/login');
+    await this.page.waitForSelector('.MuiButtonBase-root');
   }
 
   async login(username, password) {
@@ -28,10 +28,12 @@ export class LoginPage {
     await expect(this.loginButton).not.toBeVisible();
   }
 
+  async assertLoginError(expectedMessage) {
+    await expect(this.errorMessage).toContainText(expectedMessage);
+  }
+
   async logout() {
-    // Нажимаем на аватар пользователя
     await this.userMenu.click();
-    // Нажимаем на Logout
     await this.logoutMenuItem.click();
   }
 

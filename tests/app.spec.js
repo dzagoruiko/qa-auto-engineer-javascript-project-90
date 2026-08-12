@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 
 test('приложение успешно рендерится', async ({ page }) => {
-  await page.goto('http://localhost:5173');
+  // Используем относительный путь (baseURL уже настроен в playwright.config.js)
+  await page.goto('/');
   
   await expect(page.getByText('SIGN IN')).toBeVisible();
   await expect(page.getByText('Username')).toBeVisible();

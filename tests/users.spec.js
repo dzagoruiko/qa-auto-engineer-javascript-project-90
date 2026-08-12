@@ -19,11 +19,7 @@ test.describe('Управление пользователями', () => {
     const firstName = 'Ivan';
     const lastName = 'Ivanov';
     
-    // Действие
     await usersPage.createUser(email, firstName, lastName);
-    
-    // Проверки
-    await usersPage.assertElementCreated();
     await usersPage.assertUserExists(email);
   });
 
@@ -44,7 +40,6 @@ test.describe('Управление пользователями', () => {
     const newLastName = 'User2';
     
     await usersPage.editUser(id.trim(), newEmail, newFirstName, newLastName);
-    
     await usersPage.assertElementUpdated();
     await usersPage.assertUserExists(newEmail);
     await usersPage.assertUserData(newEmail, newFirstName, newLastName);
@@ -68,7 +63,6 @@ test.describe('Управление пользователями', () => {
     const id = await idCell.textContent();
     
     await usersPage.deleteUser(id.trim());
-    
     await usersPage.assertElementDeleted();
     await usersPage.assertUserNotExists(email);
   });

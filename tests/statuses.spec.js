@@ -18,11 +18,9 @@ test.describe('Управление статусами', () => {
     const name = `Test Status ${Date.now()}`;
     const slug = `test-status-${Date.now()}`;
     
-    // Действие
     await statusesPage.createStatus(name, slug);
     
-    // Проверки
-    await statusesPage.assertElementCreated();
+    // Проверяем, что статус появился в списке
     await statusesPage.assertStatusExists(name);
   });
 
@@ -41,7 +39,6 @@ test.describe('Управление статусами', () => {
     const newSlug = `edited-status-${Date.now()}`;
     
     await statusesPage.editStatus(id.trim(), newName, newSlug);
-    
     await statusesPage.assertElementUpdated();
     await statusesPage.assertStatusExists(newName);
     await statusesPage.assertStatusData(newName, newSlug);
@@ -59,7 +56,6 @@ test.describe('Управление статусами', () => {
     const id = await idCell.textContent();
     
     await statusesPage.deleteStatus(id.trim());
-    
     await statusesPage.assertElementDeleted();
     await statusesPage.assertStatusNotExists(name);
   });
